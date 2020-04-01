@@ -21,15 +21,31 @@ class ProjectController extends Controller
     public function store(Request $request)
     {
         $validateData = $request->validate([
-            'name' => 'required',
+            'title' => 'required',
             'description' => 'required',
         ]);
 
         $project = Project::create([
-            'name' => $validateData['name'],
+            'title' => $validateData['title'],
             'description' => $validateData['description'],
         ]);
 
-        return response()->json('Project created');
+        return response()->json('Project Created!');
+    }
+    public function show($id)
+    {
+        $project = Project::with(['tasks' => function($query){
+            $query->where('is_completed', false);
+        }])->find($id);
+
+        return $project->toJson();
+    }
+    public function markAsCompleted(Project $project)
+    {
+        $project->is_completed = true;
+        $project->update();
+
+        return response()->json('Project updated!');
+
     }
 }
