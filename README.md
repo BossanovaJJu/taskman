@@ -79,7 +79,7 @@ DB와 관련되어 mysql만 사용해봤었는데 이번에 SQLite를 처음으�
 ### 1. Getting stated
 
 라라벨의 새로운 프로젝트르롤 생성해보자.
-```terminal
+```
 $ laravel new taskman
 ```
 
@@ -93,7 +93,7 @@ $ laravel new taskman
 >
 > (현재 laravel/ui 2.0버전은 laravel/framework 7.0 버전에서만 사용이 가능한 거 같다.)
 
-```terminal
+```
 $ cd taskman
 $ php artisan preset react  //laravel 5.5 기준
 $ php artisan ui react      //laravel 6.x or 7.0 기준
@@ -102,7 +102,7 @@ $ php artisan ui react      //laravel 6.x or 7.0 기준
 문제없이 install되었다면 resource > js 디렉토리 내부에 component 디렉토리가 생성되고 `app.js`파일안에 `require('.components/Example');`코드가 추가되어 있습니다.  나중에 Example 컴포넌트에 필요한 코드들이 업데이트 될 예정입니다.
 
 아래 명령어를 실행하여 어플리케이션 dependencies(종속성)을 설치합니다.
-```terminal
+```
 $ npm install && npm run dev
 ```
 
@@ -113,7 +113,7 @@ $ npm install && npm run dev
 > 라라벨에서 Model의 개념 (Eloquent ORM) Migrations이 무엇인지 구글링을 통해 간단하게 알아보자.
 
 위의 planning the application 부분을 기준으로 우리는 2개의 Model이 입니다. 바로  **Task** and **Project**. 아래의 코드로 2개의 모델을 만들어 봅시다.
-```terminal
+```
 $ php artisan make:model Task -m
 $ php artisan make:model Project -m
 ```
@@ -124,7 +124,7 @@ model을 생성할때 붙이는 `-m flag` 명령어는 app 디렉토리의 model
 
 > 기본적인 Eloquent모델의 대량 할당(Mass Assignment)관련된 정보와 Model의 `$fillable`속성에 대한 구글링 자료를 확인해보자.
 
-```laravel
+```php
 //app > Task.php
 class Task extends Model
 {
@@ -134,7 +134,7 @@ class Task extends Model
 
 역시 app/Project.php 파일을 open해서 코드를 추가해 줍시다.
 
-```laravel
+```php
 //app > Project.php
 class Project extends Model 
 {
@@ -162,7 +162,7 @@ class Project extends Model
 
 
 다음으로 모델을 생성할때 `-m flag`로 추가된 migrations 파일에 밑의 코드를 추가합니다.
-```laravel
+```php
 //database > migrations > 2020_03_24_220458_create_tasks_table.php
 
 public function up()
@@ -181,7 +181,7 @@ public function up()
 
 
 마찬가지로 project migrations 파일에도 밑의 코드를 추가합니다.
-```laravel
+```php
 //database > migrations > 2020_03_24_220458_create_projets_table.php
 public function up()
 {
@@ -200,18 +200,184 @@ migrations 명령어를 실행하기 전 데이터베이스 세팅을 해야 합
 ```
 // .env
 DB_CONNECTION=sqlite
-DB_DATABASE=/Users/macbook/Dropbox/01_Study/BackEnd/laravel/taskman/laravel_react.db 
-//디렉토리 경로는 각각의 경로에 맞게 적어줍니다.
+DB_DATABASE=/Users/macbook/Dropbox/01_Study/BackEnd/laravel/taskman/laravel_react.db -->디렉토리 경로는 각각의 경로에 맞게 적어줍니다.
 ```
 
 > 나같은 경우 sqlite파일 이름을 'laravel_react.db'란 이름으로 생성했다. 진행하는데 전혀 문제가 없는거 보면 파일 확장자가 '.db' 나 '.sqlite' 이든 상관없는거 같다. 기존에 공부할때는 mysql의 mariaDB를 이용해 DB생성 및 연결을 하고 테스트를 했었는데 SQLite는 처음 사용해 보았다. 간단하게 SQLite를 정의하자면 로컬 베이스의(서버가 필요없음) DB이다. 구글링을 통해 sqlite에 대해 간단히 알아보고 넘어가는 걸 추천한다. 
 
 마지막으로 migrations 시켜줍니다.
-```terminal
+```
 $ php artisan migrate
 ```
 
 
 
 ### 3. Creating the app API
+
+첫 번째로 `routes/api.php` API 엔드포인트를 설정해 줍니다.
+
+> 여기서 가장 헷갈린 부분은 '왜 `web.php`가 아닌 `api.php`에서 Route설정을 해줄까?'' 였다. 기존 다른 포스트의 예제들은 대부분 `web.php`에서 엔드포인트를 설정했었다.(반대로 생각하면 기존 다른 예제들을 따라하면서 왜 `web.php`에 Route설정을 해주는 걸까? 라는 질문을 먼저 던졌어야 하지 않나라는 생각이 든다.) 
+>
+> 그냥 넘어갈 수는 없어서 관련된 정보를 찾아본 후 최대한 간단하게 정리해 보았다. (100%이해한 부분이 아니기 때문에 자세한 내용은 직접 구글링을 해보자.) 
+>
+> - `web.php`
+> 	- 웹 인터페이스를 위한 Route들을 정의한다.(브라우저를 통해서 유입되는 Route url 정의라고 표현할 수 있을지 모르겠다.) 
+> 	- web middleware 그룹이 할당되어 있다. (ex. 세션상태,CSRF보호 등)
+> - `api.php` 
+> 	- stateless 즉 상태가 없는 형태의 요청들을 Route로 정의한다(??상태가 없는 형태의 요청이 의미를 아직 모르겠다.) 
+> 	- api 전용 middleware 그룹이 할당되어 있다. (ex. auth,securuty 등)
+> 	- prefix로 모든 Route에 자동으로 'api/' 가 붙게 된다.
+> 	
+>
+> 여기서 **미들웨어(middleware)**란? 애플리케이션으로 들어온 HTTP요청(CRUD)을 간편하게 필터링 할 수 있게 라라벨에서 제공하는 기능이다.
+
+```php
+// routes > api.php
+
+Route::get('project', 'ProjectController@index');
+Route::post('projects','ProjectController@store');
+Route::get('project/{id}', 'ProjectController@show');
+Route::put('project/{project}', 'ProjectController@markAsCompleted');
+
+Route::post('tasks', 'TaskController@store');
+Route::put('tasks/{task}', 'TaskController@markAsCompleted');
+```
+여기서 엔드포인트 `get방식`의 'projects' 는 모든 프로젝트들을 가져오고, 'projects/{project}'는 해당하는 단일 프로젝트만을 가져옵니다.
+
+그 다음 `post방식`의 'projects' 엔드포인트와 'tasks' 엔드포인트는 각각 프로젝트와 할 일들을 생성할 수 있습니다.
+
+마지막 `put방식`의 'projects/{project}' 와 'tasks/{task}'는 각각 완료했는지 or 안했는지 대해 체크할 수 있습니다.
+
+
+
+
+다음으로 엔드포인트로 설정해 놓은 2개의 컨트롤러 **ProjectController**와 **TaskController**를 생성시켜 줍니다.
+```
+$ php artisan make:controller ProjectController
+$ php artisan make:controller TaskController
+```
+
+
+
+생성된 **ProjectController**에 아래의 코드를 추가해 줍니다.
+
+```php
+// app > Http > Controllers > ProjectController.php
+public function index() 
+{
+	$projects = Project::where('is_completed', false)
+						->orderBy('created_at', 'desc')
+						->withCount(['task'=> function ($query) {
+							$query->where('is_completed', false);
+						}])
+						->get();
+	return $projects->toJson();
+}
+```
+첫번째로 `index()` 메소드는 모든 프로젝트들을 가져옵니다. (가져오는 조건과 데이터 살펴보기)
+- (1) 프로젝트가 '완료됨'이라고 표시되지 않은 프로젝트이고(여기서는 `is_completed: false`인 프로젝트) 
+- (2) '완료됨'이라고 표시되지 않은 조건을 충족시키는 프로젝트들을 생성된 순서로(`create_at`) 내림차순(`desc`)으로 가져옵니다.
+- (3) 각 프로젝트에는 할 일들(tasks)이 포함되어 있는데, 이 포함된 할 일의 총 갯수가 몇개인지에 대한 정보도 `withCount()`메소드를 통해 가져옵니다. 여기서도 프로젝트 조건과 마찬가지로 '완료됨'이라고 표시되지 않은 할 일들의 총 숫자값을 가져옵니다.
+- (4) 조건에 충족한 모든 데이터($projects) 값들을 json 형식으로 return 받습니다.
+
+> `withCount()` 메소드는 처음 보았다. 라라벨의 helper함수인거 같긴 한데 일단 여기서는 넘어가고 예제를 전부 따라해보고 자세히 알아봐야 겠다.
+
+
+
+
+```php
+// app > Http > Controllers > ProjectController.php
+public function store(Request $request)
+{
+	$validateData = $request->validate([
+		'title' => 'required',
+		'description' => 'required'
+	]);
+	$project = Project::create([
+		'title' => $validateData['title'],
+		'description' => $validateData['description']
+	]);
+	return response()->json('Project created');
+}
+```
+두번째로 `store(Request $request)` 메소드는 새로운 프로젝트를 생성하게 해줍니다.
+- (1) 사용자가 입력한 'title'과 'description' 수신 데이터가 각 필드에 정의된 규칙에 맞는지 `validate() 메소드`를 통해 검증됩니다.
+- (2) 입력한 데이터가 문제가 없다면 데이터베이스에 새로운 프로젝트 데이터를 입력할 수 있습니다.
+- (3) JSON 형식으로 'project가 생성되었음' 라고 응답값을 return 받습니다.
+
+
+
+
+```php
+// app > Http > Controllers > ProjectController.php
+public function show($id)
+{
+	$project = Project::with(['tasks' => function($query) {
+		$query->where('is_completed', 'false');
+	}])->find($id);
+	return $project->toJson();
+}
+```
+세 번째로, `show($id)` 메소드 입니다.
+- (1) 프로젝트들이 가지고 있는 id필드 값을 이용해 단독 프로젝트를 가져옵니다.
+- (2) 단독 프로젝트에 포함되어 있는 할 일('tasks')들 중 '완료됨'이라고 표시되지 않은 할 일들만 가져옵니다.
+- (3) 조건에 충족한 모든 데이터($projects) 값들을 json 형식으로 return 받습니다.
+
+
+
+
+```php
+// app > Http > Controllers > ProjectController.php
+public function markAsCompleted(Project $project)
+{
+	$project->is_completed = true;
+	$project->update();
+	
+	return response()->json('project update');
+}
+```
+마지막으로 `markAsCompleted(Project $project)` 메소드는 간단하게 프로젝트의 'is_completed' 값을 'true'로 세팅 후 업데이트 시켜줍니다.
+
+
+
+
+
+
+다음으로 **TaskController.php**에 아래의 코드를 추가해 줍시다.
+```php
+// app > Http > Controllers > TaskController.php
+public function store(Request $request) 
+{
+	$validateData = $request->validate([
+		'title' = 'require'
+	]);
+	$task = Task::create([
+		'title' = $validateData['title'],
+		'project_id' => $request->project_id
+	]);
+	return $task->toJson();
+}
+public function markAsCompleted(Task $task)
+{
+	$task->is_completed = treu;
+	$task->update();
+	return response()->json('Task updated');
+}
+```
+
+TaskController의 `store()`&`markAsCompleted()` 메서드들은 ProjectController 메서드들과 같은 기능을 하므로 추가적인 코멘트는 하지 않고 넘어가겠습니다.
+> 예제에서는 이렇게 넘어갔지만 ProjectController와 다른점은 `project_id`유무이다. 위에서도 나왔듯이 one-to-many relationships를 이 `project_id`를 활용해서 각 프로젝트에 대한 할 일 들을 세팅해주는게 아닐까 싶다. 그러니까 각 할 일들 전부 POST방식으로 생성되면서 내가 어디 프로젝트에 속해있는지 `project_id`값을 부여받는 의미로 해석해도 될지 모르겠다. (Project Model에서 `tasks()` 메소드의 `hasMany()`메소드도 연관이 있을거 같다.)  일단 예제를 계속 진행하면서 이 부분에 대해서 나중에 정리해보도록 하자.
+
+이제 'taskman' 어플리케이션의 API 세팅이 완료되었습니다.
+
+
+
+다음으로 FrontEnd 쪽으로 넘어가보도록 하죠.
+> 드디어 React가 등장하는구나, 위의 데이터들을 어떻게 활용해서 뿌려지게 만드는지 update는 어떻게 되는지 너무 궁금하다. (두근두근)
+
+
+
+
+
+
 

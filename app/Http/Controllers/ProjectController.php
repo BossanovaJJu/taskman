@@ -46,6 +46,5 @@ class ProjectController extends Controller
         $project->update();
 
         return response()->json('Project updated!');
-
     }
 }
