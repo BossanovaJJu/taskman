@@ -275,10 +275,10 @@ public function index()
 }
 ```
 첫번째로 `index()` 메소드는 모든 프로젝트들을 가져옵니다. (가져오는 조건과 데이터 살펴보기)
-- (1) 프로젝트가 '완료됨'이라고 표시되지 않은 프로젝트이고(여기서는 `is_completed: false`인 프로젝트) 
-- (2) '완료됨'이라고 표시되지 않은 조건을 충족시키는 프로젝트들을 생성된 순서로(`create_at`) 내림차순(`desc`)으로 가져옵니다.
-- (3) 각 프로젝트에는 할 일들(tasks)이 포함되어 있는데, 이 포함된 할 일의 총 갯수가 몇개인지에 대한 정보도 `withCount()`메소드를 통해 가져옵니다. 여기서도 프로젝트 조건과 마찬가지로 '완료됨'이라고 표시되지 않은 할 일들의 총 숫자값을 가져옵니다.
-- (4) 조건에 충족한 모든 데이터($projects) 값들을 json 형식으로 return 받습니다.
+ 1. 프로젝트가 '완료됨'이라고 표시되지 않은 프로젝트이고(여기서는 `is_completed: false`인 프로젝트) 
+ 2. '완료됨'이라고 표시되지 않은 조건을 충족시키는 프로젝트들을 생성된 순서로(`create_at`) 내림차순(`desc`)으로 가져옵니다.
+ 3. 각 프로젝트에는 할 일들(tasks)이 포함되어 있는데, 이 포함된 할 일의 총 갯수가 몇개인지에 대한 정보도 `withCount()`메소드를 통해 가져옵니다. 여기서도 프로젝트 조건과 마찬가지로 '완료됨'이라고 표시되지 않은 할 일들의 총 숫자값을 가져옵니다.
+ 4. 조건에 충족한 모든 데이터($projects) 값들을 json 형식으로 return 받습니다.
 
 > `withCount()` 메소드는 처음 보았다. 라라벨의 helper함수인거 같긴 한데 일단 여기서는 넘어가고 예제를 전부 따라해보고 자세히 알아봐야 겠다.
 
@@ -301,9 +301,9 @@ public function store(Request $request)
 }
 ```
 두번째로 `store(Request $request)` 메소드는 새로운 프로젝트를 생성하게 해줍니다.
-- (1) 사용자가 입력한 'title'과 'description' 수신 데이터가 각 필드에 정의된 규칙에 맞는지 `validate() 메소드`를 통해 검증됩니다.
-- (2) 입력한 데이터가 문제가 없다면 데이터베이스에 새로운 프로젝트 데이터를 입력할 수 있습니다.
-- (3) JSON 형식으로 'project가 생성되었음' 라고 응답값을 return 받습니다.
+ 1. 사용자가 입력한 'title'과 'description' 수신 데이터가 각 필드에 정의된 규칙에 맞는지 `validate() 메소드`를 통해 검증됩니다.
+ 2. 입력한 데이터가 문제가 없다면 데이터베이스에 새로운 프로젝트 데이터를 입력할 수 있습니다.
+ 3. JSON 형식으로 'project가 생성되었음' 라고 응답값을 return 받습니다.
 
 
 
@@ -319,9 +319,9 @@ public function show($id)
 }
 ```
 세 번째로, `show($id)` 메소드 입니다.
-- (1) 프로젝트들이 가지고 있는 id필드 값을 이용해 단독 프로젝트를 가져옵니다.
-- (2) 단독 프로젝트에 포함되어 있는 할 일('tasks')들 중 '완료됨'이라고 표시되지 않은 할 일들만 가져옵니다.
-- (3) 조건에 충족한 모든 데이터($projects) 값들을 json 형식으로 return 받습니다.
+ 1. 프로젝트들이 가지고 있는 id필드 값을 이용해 단독 프로젝트를 가져옵니다.
+ 2. 단독 프로젝트에 포함되어 있는 할 일('tasks')들 중 '완료됨'이라고 표시되지 않은 할 일들만 가져옵니다.
+ 3. 조건에 충족한 모든 데이터($projects) 값들을 json 형식으로 return 받습니다.
 
 
 
@@ -368,12 +368,81 @@ public function markAsCompleted(Task $task)
 TaskController의 `store()`&`markAsCompleted()` 메서드들은 ProjectController 메서드들과 같은 기능을 하므로 추가적인 코멘트는 하지 않고 넘어가겠습니다.
 > 예제에서는 이렇게 넘어갔지만 ProjectController와 다른점은 `project_id`유무이다. 위에서도 나왔듯이 one-to-many relationships를 이 `project_id`를 활용해서 각 프로젝트에 대한 할 일 들을 세팅해주는게 아닐까 싶다. 그러니까 각 할 일들 전부 POST방식으로 생성되면서 내가 어디 프로젝트에 속해있는지 `project_id`값을 부여받는 의미로 해석해도 될지 모르겠다. (Project Model에서 `tasks()` 메소드의 `hasMany()`메소드도 연관이 있을거 같다.)  일단 예제를 계속 진행하면서 이 부분에 대해서 나중에 정리해보도록 하자.
 
+
 이제 'taskman' 어플리케이션의 API 세팅이 완료되었습니다.
+> 오 지금까지 했던 것들이 API세팅 이였구나!!
 
 
 
 다음으로 FrontEnd 쪽으로 넘어가보도록 하죠.
 > 드디어 React가 등장하는구나, 위의 데이터들을 어떻게 활용해서 뿌려지게 만드는지 update는 어떻게 되는지 너무 궁금하다. (두근두근)
+
+
+
+### 4. Creating a wildcard route
+
+우리의 어플리케이션의 라우팅을 처리하기 위해 'React Router'를 사용할 것입니다.
+그럴러면 모든 어플리케이션 루트에 대해 위한 단일 view 파일을 렌더링 해야 합니다.
+
+```php
+//routes > web.php
+Route::view('/{path?}', 'app');
+```
+> 3.creating the app API에서 설정한 모든 루트들의 view단을 리액트로 처리하기 위한 코드가 아닐까 싶다. 여기서 문득 루트 설정을 왜 `web.php`에서 해줬을까 생각해 보았다.`api.php`는 stateless, 즉 형체가 없는 루트들을 정의한다고 나와있었는데 이 말은 즉 데이터들의 루트를 말하는게 아닐까 싶다. 반대로 'web.php'는 형체가 있는 실제로 데이터 보여지는 view와 관련된 루트를 정의하는게 아닐까?? 허허 아직은 잘 모르겠다.
+
+여기서 와일드카드 루트를 정의했습니다.
+'app.blade.php' view 파일이 모든 루트들과 관련되어 렌더링하게 되고 이 view파일 안에서 리액트 컴포넌트들이 렌더링 될 것 입니다.
+
+이렇게 된다면 리액트가 제공하는 모든 장점들을 사용할 수 있께 됩니다.
+
+
+다음으로 'resources/views' 디렉토리에 'app.blade.php' 뷰파일을 생성한 후, 밑의 코드들을 추가해 줍시다.
+
+```html
+//resources/view/app.blade.php
+<!DOCTYPE html>
+<html lang="{{ app()->getLocale() }}">
+<head>
+	<meta charest="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- CSRF Token -->
+	<meta name="csrf-token" content="{{ csrf-toekn }}">
+	<title>Taskman</title>
+	<!-- Styles -->
+	<link href="{{ assets('css/app.css') }}" rel="stylesheet">
+</head>
+<body>
+	<div id="app"></div>
+	<script src="{{ asset('js/app.js') }}"></script>
+</body>
+</html>
+```
+
+CSS파일과 Javascript 참조 파일을 추가합니다. (리액트와 다른 의존성 묶음 포함)
+id값이 'app'인 빈 div에 리액트 컴포넌트들이 렌더링 될 것 입니다.
+
+또한 메타태그에 CSRF 토큰이 포함되어 있음을 알 수 있습니다.
+
+우리는 Axios를 사용해 보내는 모든 HTTP 요청을 공통 header에 첨부할 것 입니다.
+이것에 대한 정의는 'resource/assets/js/bootstrap,js' 파일에 할 예정입니다.
+
+> 여기서 처음 본 코드는 `{{ app()->getLocale() }}` | `{{ csrf_token() }}` | `{{ asset('url') }}`  이렇게 3가지이다. 
+>
+> 1.getLocale 메서드 : app파사드의 getLocale메서드는 현재 로케일?(언어)나 주어진 로케일?(언어)를 확인할 수 있다고 나와있다. 현재 사용되고 있는 로컬언어를 참조하는 메소드가 아닐까라는 생각을 해본다. [지역화 참조](https://laravel.com/docs/7.x/localization)
+>
+> 2.csrf_toekn 메소드 : `csrf_token()`메소드 자체는 라라벨의 **helper 함수이다.** 라라벨은 어플리케이션에 의해 관리되는 모든 활성화된 사용자 세션마다 CSRF "토큰"을 자동으로 만들어 줍니다. 이 토큰은 인증된 사용자가 어플리케이션에 request을 할 수 있는 고유한 사용자라는 것을 확인하는데 사용된다고 나와있다. 
+>
+> HTML을 정의할때, CSRF토큰을 포함시켜서 CSRF보호 미들웨어가 requeset-요청을 검증할 수 있도록 해야한다고 나와있다. 분명 예전에 csrf_token메서드를 추가하지 않거나 `@csrf` 블레이드 지시어를 추가하지 않게되면 '크로스 사이트 공격'과 관련된 error 메세지가 떴었더거 같다. 나중에 테스트를 해보자. [CSRF보호 참조](https://laravel.kr/docs/6.x/csrf) 
+>
+> 3.asset 메소드 : `asset(url)` 역시 라라벨의 **helper 함수**로서 url변수를 설정하여 asset의 URL 호스트를 설정할 수 있다고 한다.  [helpder함수 참조](https://laravel.kr/docs/6.x/helpers#method-csrf-token)
+
+
+
+
+
+### 5. Creating the App Component
+
 
 
 
