@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter as Router, Route, Switch} from 'react-router-dom'
 import Header from './Header'
+import ProjectList from "./ProjectList";
 
 
 class App extends Component {
@@ -10,6 +11,9 @@ class App extends Component {
 			<Router>
 				<div>
 					<Header/>
+				</div>
+				<div>
+					<ProjectList/>
 				</div>
 			</Router>
 		)

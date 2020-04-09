@@ -502,9 +502,75 @@ export default Header;
 ```
 여기서 React Router 에서 **Link**컴포넌트를 활용하고 있다.
 즉 Taskman앱 어느 페이지를 찾아가든 새로고침되지 않을 것이다.
-> 위의 내용은 그대로 번역한 말인데 '새로고침 되지 않을 것이다'란 말을 잘 이해하지는 못했다. Header라고 하면 보통 어플리케이션에서는 상단 position:fixed로 모든 페이지에서 고정으로 보여지게 되는데 그 뜻을 말하는게 아닐까? 라는 생각을 해보았다.
+> 위의 내용은 그대로 번역한 말인데 '새로고침 되지 않을 것이다'란 말을 잘 이해하지는 못했다. Header라고 하면 보통 어플리케이션에서는 상단 position:fixed로 모든 페이지에서 고정으로 보여지게 되는데 그 뜻을 말하는게 아닐까? (아님말구..ㅠㅠ)
 
 > css스타일은 Bootstrap로 설정해주었다. 사실 Bootstrap을 거의 사용해 본적이 없어서 자세한 내용은 [Boostrap공식 홈페이지](https://getbootstrap.com/) 를 참조해야 겠다.
-> 
+
+> 뒤에서 예제들을 진행하다보면 자세히 알 수 있겠지만 간단하게 `App.js`와 `Header.js`를 살펴보면 App.js에서  리액트에서 라우팅이 필요한 컴포넌트들을 <Router>로 감싸주고(현재는 <Header>가 포함되어 있다.) 나중에는 필요한 라우팅 컴포넌트들이 추가되고 <Route>기능도 사용하게 되지 않을까? 라는 생각이 문득 들었다.
 
 ### 7. Displaying all projects yet to be completed
+이제 실제 project들을 보여지게 만들어 봅시다.
+아직 완료되지 않은 프로젝트들의 리스트가 보여져야 합니다.
+'resources > assets > js > components' 폴더안에 'ProjectList.js'파일을 생성 후 아래의 코드를 업데이트 합니다.
+
+```react
+import React, {Component} from 'react';
+import {Link} from 'react-router-dom';
+import Axios from 'axios';
+
+class Project extends Component {
+	constructor() {
+		super()
+		this.state = {
+			projects: []
+		}
+	}
+	componentDidMount() {
+		Axios.get('/api/projects').then(response => {
+			this.setState({
+				projects: response.data
+			})
+		})
+	}
+	render() {
+		const { projects } = this.state;
+		return(
+			<div className='container py-4'>
+				<div className='row justify-content-center'>
+					<div className='col-md-8'>
+						<div className='card'>
+							<div className='card-header'>All Projects</div>
+							<div className='card-body'>
+								<Link className='btn btn-primary btn-sm mb-3' to='/create'>
+                  Create New Project 
+								</Link>
+								<ul className='list-group list-group'>
+									{projects.map(project => (
+										<Link className='list-group-item list-group-item-action d-flex justify-content-between align-items-center'>
+											{project.name}
+											<span className='badge badge-primary badge-pill'>
+												{project.tasks_count}
+											</span>
+										</Link>
+									))}
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>						
+		)
+	}
+}
+export default ProjectList
+```
+
+1. 'projects' state를 빈 배열의 초기화 상태로 정의했습니다.
+2. 리액트 라이프 싸이클인 `componentDidMount`메소드를 사용했습니다.
+3. 앱의 API엔드포인트에 대한, 즉 완료되지 않음이라고 표시되어 있는 프로젝트들을 가져오는 HTTP요청을 `Axios`라이브러리를 활용합니다. 그렇게 되면 요청한 데이터에 대한 응답 데이터를 앱의 API로부터 가져온 후 'projects'의 state로 업데이트 됩니다.
+4. 그 결과 'projects'의 state에 대한 업데이트가 반복되면서 프로젝트들의 전체 목록이 보여지게 됩니다.
+
+> Axios는 node.js와 브라우저를 위한 HTTP 통신 js 라이브러리 fetch API와 비교했을때 장점도 더 많다고 나와있다.(axios는 여기서 처음 써보았다)
+> 기존에 **3.Creating the app API**에서 설정한 '/api/projects' Route에 index 컨트롤러 메소드를 활용하게 되는거 같다. 얼핏 보자면 백엔드단 라라벨에서 API로 DB에 있는 데이터를 중간에서 Axios가 받아와 리액트로 전달해즈고 결국 프론트엔드단의 리액트의 `projects` state값에 저장되어 실제 우리에게 보여지는게 아닐까? 
+
+테스트 하기 전, `App.js` 컴포넌트에 아래의 코드를 업데이트 합시다.
