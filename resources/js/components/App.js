@@ -11,9 +11,9 @@ class App extends Component {
 			<Router>
 				<div>
 					<Header/>
-				</div>
-				<div>
-					<ProjectList/>
+					<Switch>
+						<Route exact path='/' component={ProjectList} />
+					</Switch>
 				</div>
 			</Router>
 		)

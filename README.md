@@ -574,3 +574,82 @@ export default ProjectList
 > 기존에 **3.Creating the app API**에서 설정한 '/api/projects' Route에 index 컨트롤러 메소드를 활용하게 되는거 같다. 얼핏 보자면 백엔드단 라라벨에서 API로 DB에 있는 데이터를 중간에서 Axios가 받아와 리액트로 전달해즈고 결국 프론트엔드단의 리액트의 `projects` state값에 저장되어 실제 우리에게 보여지는게 아닐까? 
 
 테스트 하기 전, `App.js` 컴포넌트에 아래의 코드를 업데이트 합시다.
+
+```react
+import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import Header from './Header';
+import ProjectList from './ProjectList';
+
+class App extends Component {
+	render() {
+		return(
+			<Router>
+				<div>
+					<Header />
+					<Switch>
+						<Route exact path='/' component={ProjectList} />
+					</Switch>
+				</div>
+			</Router>		
+		)
+	}
+}
+ReactDOM.render(<App />, document.getElementById('app'));
+```
+여기서 '/'(mainPage) 새로운 라우트를 추가했습니다.
+언제 어디서든 '/' 경로로 방문한다면 `ProjectList` 컴포넌트가 렌더링 될 것입니다.
+
+### 8. Creating a new project
+'ProjectList'컴포넌트에는 `<Link to='/create'>`로 새로운 프로젝트 생성 페이지로 링크되어 있습니다. 해당 페이지를 만들어 봅시다.
+'resources > assets > js > components' 폴더 안에 **NewProject.js**파일을 생성하고 아래의 코드를 따라 업데이트 해 줍니다.
+
+```react
+//resources > assets > js > components > NewProject.js
+import React, { Component } from 'react';
+import Axios from 'axios';
+
+class NewProject extends Component {
+	constructor(props) {
+		super(props);
+		this.setState = {
+			name: '',
+			description: '',
+			erros: []
+		}
+	}
+	handleFieldChange = event => {
+		this.setState({
+			[event.target.name]: event.target.value
+		})
+	}
+  handleCreateNewProject = event => {
+  	event.preventDefault();
+  	const { history } = this.props;
+  	const project = {
+  		name: this.state.name,
+  		description: this.state.description
+  	}
+  	
+  	Axios.post('/api/projects', project)
+  	.then( response => {
+  		history.push('/')
+  	})
+  	.catch( error => {
+  		this.setState({
+  			errors: error.response.data.errors
+  		})	
+  	})
+  
+  }
+```
+
+> 원문의 코드에서는 `constructor()`메소드에서 각 메소드들에 대해 this 바인딩을 위한 `this.handleFieldChange = this.handleFieldChange(this)`코드가 추가되어 있었다. 번거롭기도 하고 일정한 this를 상속받기 위해서 화살표 함수를 사용했다.
+
+1. 위의 컴포넌트는 새로운 프로젝트 생성을 위한 form을 렌더링 해줍니다.  'name & description & errros'의 state값들을 초기화 해주었습니다.
+2. 새로운 프로젝트 생성폼 안의 input 필드(name & descipriotn)에서 텍스트가 입력될때 즉, onChange이벤트가 발생할때마다 호출되는 `handleFieldChange()`메소드를 정의했습니다. 이벤트로 발생한 input값들을 `[event.target.name]`속성을 이용해 초기화 되어있는 state(name & description) 각각에 값을 전달해 줍니다.
+3. 다음으로 submit 제출 버튼을 눌렀을때 발생하는 `handleCreateNewProject()` 메소드를 정의했습니다.
+	- 첫번째로 사용자의 폼 제출과 과련 기본 동작을 막기 위해 `preventDefault`를 호출합니다.
+	- 두번째로 `this.props`를 이용해 `history`에 부모의(ProjectList) state값을 넣어 줍니다. (나중에 HTTP요청으로 제대로 데이터가 입력되었다면 부모이(ProjectList) state값을 업데이트 시켜줘야 합니다.)
+	- 세번째로 우리가 설정해놓은 앱 API 엔드포인트에 폼 데이터(project)와 함께 HTTP 요청을 전달합니다. 만약 문제가 없다면 new project 생성 버튼을 눌렀을때 간단히 **redirect**되어 'ProjectList' 컴포넌트 페이지로 리디렉트 될 것입니다. 
