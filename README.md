@@ -1,3 +1,5 @@
+
+
 # Using React in a Laravel application
 
 
@@ -546,7 +548,11 @@ class Project extends Component {
 								</Link>
 								<ul className='list-group list-group'>
 									{projects.map(project => (
-										<Link className='list-group-item list-group-item-action d-flex justify-content-between align-items-center'>
+										<Link 
+											className='list-group-item list-group-item-action d-flex justify-content-between align-items-center'
+											to={'/${project.id}'}
+											key={project.id}
+										>
 											{project.name}
 											<span className='badge badge-primary badge-pill'>
 												{project.tasks_count}
@@ -641,8 +647,61 @@ class NewProject extends Component {
   			errors: error.response.data.errors
   		})	
   	})
-  
   }
+  hasErrorFor = field => {
+		return !!this.state.errors[field]
+	}
+	renderErrorFor = field => {
+		if(this.hasErrorFor(field)) {
+			return(
+				<span className='invalid-feedback'>
+					<strong>{this.state.erros[field][0]}</strong>
+				</span>
+			)
+		}
+	}
+	render() {
+		return(
+			<div className='container py-4'>
+				<div clasaName='row justify-content-center'>
+					<div className='col-md-6'>
+						<div className='card'>
+							<div className='card-header'>Create New Project</div>
+							<div className='card-body'>
+								<form onSubmit={this.handleCreateNewProject}>
+									<div className='form-group'>
+										<label htmlFor='name'>Project Name</label>
+										<input
+											id='name'
+											type='text'
+											className={ `form-control ${this.hasErrorFor('name') ? 'is-invalid' : ' '}` }
+											name='name'
+											value={this.state.name}
+											onChange={this.handleFieldChange}
+										/>
+										{this.renderErrorFor('name')}
+									</div>
+                  <div className='form-group'>
+                  	<label htmlFor='description'>Project description</label>
+                  	<textarea
+                  		id='description'
+                  		className={ `form-control ${this.hasErrorFor('description' ? 'is-invalid' : ' ')}` }
+                  		name='description'
+                  		row='10'
+                  		onChange={this.handleFieldChange}
+                  	/>
+                  	{this.renderErrorFor('description')}
+                  </div>
+                  <button className='btn btn-primary'>Create</button>
+                 </form>
+                </div>
+              </div>
+            </div>
+         </div>
+    	</div>             
+		)
+	}	
+}
 ```
 
 > 원문의 코드에서는 `constructor()`메소드에서 각 메소드들에 대해 this 바인딩을 위한 `this.handleFieldChange = this.handleFieldChange(this)`코드가 추가되어 있었다. 번거롭기도 하고 일정한 this를 상속받기 위해서 화살표 함수를 사용했다.
@@ -651,5 +710,37 @@ class NewProject extends Component {
 2. 새로운 프로젝트 생성폼 안의 input 필드(name & descipriotn)에서 텍스트가 입력될때 즉, onChange이벤트가 발생할때마다 호출되는 `handleFieldChange()`메소드를 정의했습니다. 이벤트로 발생한 input값들을 `[event.target.name]`속성을 이용해 초기화 되어있는 state(name & description) 각각에 값을 전달해 줍니다.
 3. 다음으로 submit 제출 버튼을 눌렀을때 발생하는 `handleCreateNewProject()` 메소드를 정의했습니다.
 	- 첫번째로 사용자의 폼 제출과 과련 기본 동작을 막기 위해 `preventDefault`를 호출합니다.
-	- 두번째로 `this.props`를 이용해 `history`에 부모의(ProjectList) state값을 넣어 줍니다. (나중에 HTTP요청으로 제대로 데이터가 입력되었다면 부모이(ProjectList) state값을 업데이트 시켜줘야 합니다.)
-	- 세번째로 우리가 설정해놓은 앱 API 엔드포인트에 폼 데이터(project)와 함께 HTTP 요청을 전달합니다. 만약 문제가 없다면 new project 생성 버튼을 눌렀을때 간단히 **redirect**되어 'ProjectList' 컴포넌트 페이지로 리디렉트 될 것입니다. 
+	- 두번째로 `this.props`를 이용해 `history`에 부모의(ProjectList) state값을 넣어 줍니다. (나중에 HTTP요청으로 제대로 데이터를 가져왔다면 부모의(ProjectList) state값을 업데이트 시켜줘야 합니다.)
+	- 세번째로 우리가 설정해놓은 앱 API 엔드포인트에 폼 데이터(project)와 함께 HTTP 요청을 전달합니다. 만약 문제가 없다면 new project 생성 버튼을 눌렀을때 간단히 **redirect**되어 'ProjectList' 컴포넌트 페이지로 리디렉트 될 것입니다. (반대 상황이라면 앱 API 에서 가져온 응답 error 데이터를 state의 errors에 업데이트 될 것입니다.)
+4.`hasErrorFor()`메소드는 지정된 필드값들이(name,description)이 에러가 있는지 없는지를 체크한 후 'true','false'값을 리턴시켜 줍니다. 결국 `renderErrorFor()`메소드에서 이 리턴값을 이용해 필드값에 문제가 있을 경우 에러메세지를 노출시켜 줍니다.
+
+ProjectList 컴포넌트와 마찬가지로, `App` 컴포넌트에 `NewProject`를 추가시켜 줍시다.
+```react
+import React, { Component } from 'react';
+import ReactDOM fro 'react-dom';
+import { Browser as Router, Switch, Router } from 'react-router-dom';
+import Header from './Header';
+import ProjectList from './components/ProjectList';
+import NewProject from './components/NewProject';
+
+class App extends Component {
+	render() {
+		return(
+			<Router>
+				<div className='container'>
+					<Header />
+					<Switch>
+						<Route exact path='/' component={ProjectList} />
+						<Route path='/create' component={NewProject} />
+					</Switch>
+				</div>
+			</Router>
+		)
+	}
+}
+ReactDOM.render('<App />', document.getElementById('app'))
+```
+위와같이 새로운 프로젝트를 만들기 위해 `/create` 루트를 정의했습니다. 해당 경로(페이지)에 방문할때마다 `NewProject`컴포넌트가 렌더링 될 것입니다.
+
+
+
