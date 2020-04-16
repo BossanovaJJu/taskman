@@ -13,7 +13,7 @@
 
 
 
-### 시작하기에 앞서..
+시작하기에 앞서..
 제가 생각하는 라라벨은 백엔드와 관련되어 DB의 데이터를 더 쉽게 컨트롤 할 수 있고 라라벨에서 지원하는 각종 기능과 함수들로 더 빠르게 어플리케이션을 만들 수 있게 도와주는 프레임워크 같습니다.  모던 PHP로 구성되어 있고 지금 당장 PHP의 깊은 지식이 있지 않은 저 같은 사람들도 간단한 어플리케이션을 만들 수 있게 도와줍니다.
 
 >이런 걸 양산형 개발자라고 하는것인가;; 
@@ -744,3 +744,120 @@ ReactDOM.render('<App />', document.getElementById('app'))
 
 
 
+
+
+### 9. Display a single project
+지금부터 단일 프로젝트가 보여지게 해봅시다.
+아시다시피 `ProjectList`컴포넌트에서는 각 project의 id값 순서로 프로젝트들이 리스트로 보여집니다.
+
+`resource/assets/js/components` 디렉토리에 `SingleProject.js`파일을 생성 후 아래의 코드를 추가해 줍니다.
+
+```react
+//resources/assets/js/components/SingleProject.js
+import React, { Component } from 'react';
+import Axios from 'react-router-dom';
+
+class SingleProject extends Component {
+	constructor(props) {
+		super(props)
+		this.state = {
+			project: {},
+			tasks: []
+		}
+	}
+	
+	componentDidMount() {
+		const projectId = this.props.match.params.id
+		Axios.get(`/api/projects/${projectId})`).get(response => {
+			this.setState({
+				project: response.data,
+				tasks: response.data.tasks
+			})
+		})
+	}
+	render() {
+		const { project, tasks } = this.props;
+		return(
+			<div className='container py-4'>
+				<div className='row justify-content-center'>
+					<div className='col-md-8'>
+						<div className='card'>
+							<div className='card-header'>{project.title}</div>
+							<div className='card-body'>
+								<p>{project.description}</p>
+								<button className='btn btn-primary btn-sm'>
+									Mark as completed
+								</button>
+								<hr />
+								<ul className='list-group mt-3'>
+									{tasks.map(task => (
+										<li 
+											className='list-group-item d-flex justify-content-between align-items-center'
+											key={taks.id}
+										>
+											{task.title}
+											<button className='btn btn-primary btn-sm'>
+												Mark as completed
+											</button>
+										</li>
+									))}
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		)
+	}
+}
+export default SingleProject;
+```
+> 단일 project값을 받아오는 거면 왜 `project state 속성값은` 단순히 문자열 값 `' '`이 아닌 초기화 할 줄 알았는데 `{}`로 초기화를 해주었는지 이해가 가지 않았다. 
+> projects table이 가지고 있는 `id,description,title,is_completed`모든 필드 값들을 담아주기 위해서 `{}` 필드값으로 할당해주었다는걸 나중에 알게 되었다.
+
+1. project와 task 각 state 속성 값들을 정의해 줍니다.
+2. project state 속성값은 지정된(해당 projectId) 프로젝트값을 할당해주고 tasks state 속성값은 해당 프로젝트에 포함되어 있는 할일 목록들을 할당해 줍니다.
+3. `componentDidMount`라이프 싸이클 메소드는 Axios를 이용해 해당 프로젝트의 지정된 `projectId`값을 가져오기 위해 우리가 설정해 놓은 앱 API로 HTTP 요청을 보냅니다.
+4. `this.props.match.params.id`를 사용해 가져온 `projectId`값은 URL로 전달됩니다.
+5. 응답 데이터에 문제가 없다면 state속성값(project & tasks)들이 setState로 업데이트 됩니다.
+
+> `this.props`는 잘 알고 있었지만 `this.props.match.params.id`는 여기서 처음 보게 되었다. this.props 필드값들 중 id와 매칭되는 필드값을 가져오는게 아닐까 싶다.
+
+마침내, 프로젝트와 속해있는 할 일들에 대해 자세히 보여지게 되었습니다. 또한 각 프로젝트와 할일들이 완료가 되었는지를 체크할 수 있는 버튼도 추가되었습니다.
+
+다음으로 `App`컴포넌트에 `SingleProject`컴포넌트를 추가해 줍시다.
+
+```react
+import React, { Component } from 'react';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import ProjectList from './components/ProjectList';
+import Header from './components/Header';
+import NewProject from './components/NewProject';
+import SingleProject from './components/SingleProject';
+
+class App extends Component {
+	render() {
+		return(
+			<Router>
+				<div className='container'>
+					<Header />
+					<Switch>
+						<Route exact path='/' component={ProjectList}/>
+						<Route path='/create' component={NewProject}/>
+						<Route path='/:id' component={SingleProject}/>
+					</Switch>
+				</div>
+			</Router>
+		)
+	}
+}
+export default App;
+```
+> `path값`이 `/:id` 이런식으로 들어가는 건 처음 본다.
+
+
+
+
+
+
+### 10. Marking a project as completed
