@@ -5,7 +5,7 @@ class NewProject extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			name: '',
+			title: '',
 			description: '',
 			errors: []
 		}
@@ -21,8 +21,8 @@ class NewProject extends Component {
 		event.preventDefault();
 		const {history} = this.props;
 		const project = {
-			name: this.state.name,
-			description: this.state.descent
+			title: this.state.title,
+			description: this.state.description
 		}
 
 		Axios.post('/api/projects', project)
@@ -61,13 +61,13 @@ class NewProject extends Component {
 							<div className='card-body'>
 								<form onSubmit={this.handleCreateNewProject}>
 									<div className='form-group'>
-										<label htmlFor='name'>Project name</label>
+										<label htmlFor='title'>Project title</label>
 										<input
-											id='name'
+											id='title'
 											type='text'
-											className={`form-control ${this.renderErrorFor(('name') ? 'is-invalid' : ' '}`}
-											name='name'
-											value={this.state.name}
+											className={`form-control ${this.renderErrorFor('title') ? 'is-invalid' : ''}`}
+											name='title'
+											value={this.state.title}
 											onChange={this.handleFieldChange}
 										/>
 										{this.renderErrorFor('name')}

@@ -38,7 +38,7 @@ class ProjectList extends Component {
 											to={'/${project.id}'}
 											key={project.id}
 										>
-											{project.name}
+											{project.title}
 											<span className='badge badge-primary badge-pill'>
 												{project.tasks_count}
 											</span>
