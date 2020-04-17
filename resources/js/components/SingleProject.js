@@ -18,6 +18,11 @@ class SingleProject extends Component {
 			})
 		})
 	}
+	handleMarkProjectAsCompleted = () => {
+		const { history } = this.props;
+		Axios.put(`/api/projects/${this.state.project.id}`)
+			then(response => history.push('/'))
+	}
 
 	render() {
 		const { project, tasks } = this.state;
@@ -40,7 +45,10 @@ class SingleProject extends Component {
 											key={task.id}
 										>
 											{task.title}
-											<button className='btn btn-primary btn-sm'>
+											<button
+												className='btn btn-primary btn-sm'
+												onClick={this.handleMarkProjectAsCompleted}
+											>
 												Mark as completed
 											</button>
 										</li>

@@ -861,3 +861,30 @@ export default App;
 
 
 ### 10. Marking a project as completed
+
+프로젝트가 완료되었는지 표시할 수 있는 코드를 추가해 봅시다.
+`SinglProject 컴포넌트`에 아래의 코드를 업데이트 합니다.
+```react
+//resources > assets > js > components > SingleProject.js
+//메소드 추가하기
+handleMarkProjectAsCompleted = () => {
+	const { history } = this.props;
+	Axios.put(`/api/projects/${this.state.project.id}`)
+		.then(response => history.push('/'))
+}
+
+1. `markAsCompleted 버튼`을 클릭하게 되면 `handleMarkAsCompleted()`메소드가 호출됩니다.
+2. 이 메소드는 프로젝트 ID에 따라 완료되었는지 표시하게 하는 우리가 설정해놓은 앱의 API(api.php)에 PUT HTTP요청을 하게 됩니다.
+3. 만약 요청이 성공했다면, 메인페이지로 리다이렉트 되어서 새로운 projects 리스트로 업데이트 될 것 입니다.
+
+다음으로 `SingleProject 컴포넌트` 하단에 있는 `markAsCompleted`버튼의 클릭이벤트에 `handleMarkAsCompleted`메소드를 추가해 줍니다.
+```js
+//resources > assets > js > components > SingleProject.js
+<button 
+	class='btn btn-primary btn-sm'
+	onClick={this.handleMarkAsCompleted}
+>
+	markAsCompleted
+</button>
+
+### 11. Adding a task to project
