@@ -6,7 +6,9 @@ class SingleProject extends Component {
 		super(props);
 		this.state = {
 			project: {},
-			tasks: []
+			tasks: [],
+			taskTitle: '',
+			taskErros: []
 		}
 	}
 	componentDidMount() {
@@ -21,7 +23,49 @@ class SingleProject extends Component {
 	handleMarkProjectAsCompleted = () => {
 		const { history } = this.props;
 		Axios.put(`/api/projects/${this.state.project.id}`)
-			then(response => history.push('/'))
+			.then(response => history.push('/'))
+	}
+	handleFieldChange = event => {
+		this.setState({
+			taskTitle: event.target.value
+		})
+	}
+	handleAddNewTask = event => {
+		event.preventDefault();
+
+		const task = {
+			taskTitle: this.state.taskTitle,
+			project_id: this.state.project.id
+		}
+
+		Axios.post('/api/tasks', task)
+			.then(response => {
+				//clear form input
+				this.setState({
+					taskTitle: ''
+				})
+				//add new task to list of tasks
+				this.setState(prevState => ({
+					tasks: prevState.tasks.concat(response.data)
+				}))
+			})
+			.catch(error => {
+				this.setState({
+					taskErrors: error.response.data.errors
+				})
+			})
+	}
+	hasErrorFor = field => {
+		return !!this.state.taskErrors[field]
+	}
+	renderErrorFor = field => {
+		if(hasErrorFor) {
+			return (
+				<span className='invalid-feedback'>
+					<strong>{this.state.taskErrors[field][0]}</strong>
+				</span>
+			)
+		}
 	}
 
 	render() {
@@ -34,10 +78,29 @@ class SingleProject extends Component {
 							<div className='card-header'>{project.title}</div>
 							<div className='card-body'>
 								<p>{project.description}</p>
-								<button className='btn btn-primary btn-sm'>
+								<button
+									className='btn btn-primary btn-sm'
+									onClick={this.handleMarkProjectAsCompleted}
+								>
 									Mark as completed
 								</button>
 								<hr/>
+								<form onSubmit={this.handleAddNewTask}>
+									<div className='input-group'>
+										<input
+												type='text'
+												name='title'
+												className={`form-control ${this.hasErrorFor('title') ? 'is-invalid' : ''}`}
+												placeholder='Task title'
+												value={this.state.taskTitle}
+												onChange={this.handleFieldChange}
+										/>
+										<div className='input-group-append'>
+											<button className='btn btn-primary'>Add</button>
+										</div>
+										{this.renderErrorFor('title')}
+									</div>
+								</form>
 								<ul className='list-group mt-3'>
 									{tasks.map(task => (
 										<li
@@ -47,7 +110,7 @@ class SingleProject extends Component {
 											{task.title}
 											<button
 												className='btn btn-primary btn-sm'
-												onClick={this.handleMarkProjectAsCompleted}
+
 											>
 												Mark as completed
 											</button>

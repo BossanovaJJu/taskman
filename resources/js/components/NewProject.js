@@ -70,7 +70,7 @@ class NewProject extends Component {
 											value={this.state.title}
 											onChange={this.handleFieldChange}
 										/>
-										{this.renderErrorFor('name')}
+										{this.renderErrorFor('title')}
 									</div>
 									<div className='form-group'>
 										<label htmlFor='description'>Project Description</label>

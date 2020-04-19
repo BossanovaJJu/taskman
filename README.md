@@ -864,7 +864,7 @@ export default App;
 
 프로젝트가 완료되었는지 표시할 수 있는 코드를 추가해 봅시다.
 `SinglProject 컴포넌트`에 아래의 코드를 업데이트 합니다.
-```react
+```php
 //resources > assets > js > components > SingleProject.js
 //메소드 추가하기
 handleMarkProjectAsCompleted = () => {
@@ -872,12 +872,14 @@ handleMarkProjectAsCompleted = () => {
 	Axios.put(`/api/projects/${this.state.project.id}`)
 		.then(response => history.push('/'))
 }
+```
 
 1. `markAsCompleted 버튼`을 클릭하게 되면 `handleMarkAsCompleted()`메소드가 호출됩니다.
 2. 이 메소드는 프로젝트 ID에 따라 완료되었는지 표시하게 하는 우리가 설정해놓은 앱의 API(api.php)에 PUT HTTP요청을 하게 됩니다.
 3. 만약 요청이 성공했다면, 메인페이지로 리다이렉트 되어서 새로운 projects 리스트로 업데이트 될 것 입니다.
 
 다음으로 `SingleProject 컴포넌트` 하단에 있는 `markAsCompleted`버튼의 클릭이벤트에 `handleMarkAsCompleted`메소드를 추가해 줍니다.
+
 ```js
 //resources > assets > js > components > SingleProject.js
 <button 
@@ -886,5 +888,88 @@ handleMarkProjectAsCompleted = () => {
 >
 	markAsCompleted
 </button>
+```
 
 ### 11. Adding a task to project
+프로젝트에 새로운 task를 추가하는 기능을 추가해 봅시다.
+`SingleProject` 컴포넌트에 아래의 코드를 추가합니다.
+
+```js
+// resources > assets > js > components > SingleProject.js
+
+//constructor 초기화 함수에 state 값 추가하기
+this.state = {
+	..., //기존에 선언한 project,tasks속성값들
+	taksTitle: '',
+	taskErrors: []
+}
+
+//다른 메서들과 같은 위치에 추가
+handleFieldChange = event => {
+	this.setState({
+		tasksTitle: event.target.value
+	})
+}
+handleAddNewTask = event => {
+	event.preventDefault()
+	const task = {
+		taskTitle: this.state.taskTitle,
+		projectId: this.state.project.id
+	}
+	Axios.post('/api/tasks', task)
+		.then(response => {
+			this.setState({
+				taskTitle: ''
+			})
+			this.setState(prevState => ({
+				tasks: prevState.tasks.concat(response.data)
+			}))
+		})
+		.catch(error => {
+			this.setState({
+				taskErrors: error.response.data.errors
+			})
+		})
+}
+hasErrorFor = field => {
+	return !!this.state.taskErrors[field]
+}
+renderErrorFor = field => {
+	if(this.hasErrorFor) {
+		return (
+			<span className='invalid-feedback'>
+				<strong>{this.state.taskErrors[field][0]}</strong>
+			</span>
+		)
+	}
+}
+```
+1. `handleFieldChange() & hasErrorFor() & renderErrorFor()` 메소드들은 모두 `NewProject`컴포넌트와 동일합니다. (증복되는 설명은 빼도록 하겠습니다.)
+2. `handleAddNewTask`메소드 역시 `NewProject > handleCreateNewProject`메소드와 비슷합니다.
+> 본문에서는 위의 2가지 메소드 차이점에 대한 따른 언급은 없었다. 분명 input에 입력한 값을 submit로 새로운 project와 task를 생성하는 기능은 똑같지만, API에 요청한 데이터를 받아온 후 리스트에 업데이트 하는 방식은 차이가 있다. 
+> `NewProject`컴포넌트에서는 const { history } = this.props; / history.push('/') 활용해서 업데이트 되고 `SingleProject`컴포넌트에서는 처음 보게 된 this.setState()의 `prevState`를 이용해 'tasks:prevState.tasks.concat(response.data)'로 업데이트 되는 차이가 있다.
+3. 만약 API에 HTTP요청이 문제가 없다면 첫번째로 form의 input value값을 초기화 시킨 다음 state tasks에 새로운 task가 업데이트 되어 리스트로 보여질 것입니다.
+
+다음으로, `SingleProject > render() > hr/` 코드 밑에 아래의 코드를 추가해 줍니다.
+```php
+<form onSubmit={this.handleAddNewTask}>
+	<div className='input-group'>
+		<input
+			type='text'
+			name='title'
+			className={`form-control ${this.hasErrorFor('title') ? 'is-invalid' : ''}`}
+			placeholder='Task title'
+			value={this.state.taskTitle}
+			onChange={this.handleFieldChange}
+		/>
+		<div className='input-group-append'>
+			<button className='btn btn-primary'>Add</button>
+		</div>
+		{this.renderErrorFor('title')}
+	</div>
+</form>
+```
+이로서 새로운 task를 추가하는 기능 구현이 완료되었습니다.
+
+### 12. Marking a task as completed
+
