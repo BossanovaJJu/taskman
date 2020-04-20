@@ -972,4 +972,37 @@ renderErrorFor = field => {
 이로서 새로운 task를 추가하는 기능 구현이 완료되었습니다.
 
 ### 12. Marking a task as completed
+마지막으로 각 task에 완료되었는지 체크하는 기능을 만들어 봅시다.
+위에서 다뤘던 project에서 완료 여부를 체크하는 기능과 거의 유사합니다.
+아래의 코드를 `SingleProject`컴포넌트에 추가해 봅시다.
+```js
+//resources > assets > js > components > SingleProject.js
+
+handleMarkTaskAsCompleted = taskId => {
+	Axios.put(`/api/tasks/${taskId}`).then(reponse => {
+		this.setState(prevState => ({
+			tasks: prevState.tasks.filter(task => {
+				task.id !== taskId
+			})
+		}))
+	})
+}
+```
+1. 위에서 `handleMarkProjectAsCompleted` 메소드와 같지 않습니다.
+> project단에 있는 `markAsCompleted`버튼을 누르게 되면 `history.push('/')`로 메인페이지로 리다이렉트 되었었다.
+2. `handleMarkTaskAsCompleted`메소드에서는 task단에 있는 `markAsCompleted` 버튼을 누르게 되면 bind(this, task.id)를 이용해 현재 사용자가 클릭한 task의 해당하는 id값을 bind를 이용해 가져올 수 있습니다.
+3. 결국 이 id값으로 앱 API에 put방식으로 HTTP 요청을 하게 됩니다.
+4. 문제없이 요청이 성공했다면 `filter()`메소드를 활용해 현재 클릭한 task id값과 기존의 task들의 각id값을 전부 비교하여 같지 않은 task들만 state tasks에 업데이트 되어  task 리스트가 새롭게 보여지게 됩니다,
+
+다음으로 Task단 `markAsCompleted` 버튼에 핸들러 메소드를 추가해 줍니다.
+```js
+//resources > assets > js > components > SingleProject.js 
+<button 
+	className="btn btn-primary btn-sm"
+	onClick={this.handleMarkTaskAsCompleted.bind(this, task.id)}
+/>
+```
+위의 버튼을 클릭하게되면 `handleMarkTaskAsCompleted`메소드에 해당 task의 id값을 전달해 줍니다.
+
+
 

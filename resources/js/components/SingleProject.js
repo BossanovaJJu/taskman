@@ -67,6 +67,16 @@ class SingleProject extends Component {
 			)
 		}
 	}
+	handleMarkTaskAsCompleted = taskId => {
+		Axios.put(`/api/tasks/${taskId}`)
+			.then(response => {
+				this.setState(prevState => ({
+					tasks: prevState.tasks.filter(task => {
+						return task.id !== taskId
+					})
+				}))
+			})
+	}
 
 	render() {
 		const { project, tasks } = this.state;
@@ -110,7 +120,7 @@ class SingleProject extends Component {
 											{task.title}
 											<button
 												className='btn btn-primary btn-sm'
-
+												onClick={this.handleMarkTaskAsCompleted.bind(this, task.id)}
 											>
 												Mark as completed
 											</button>
