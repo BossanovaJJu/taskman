@@ -70194,7 +70194,7 @@ var ProjectList = /*#__PURE__*/function (_Component) {
       }, projects.map(function (project) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["Link"], {
           className: "list-group-item list-group-item-action d-flex justify-content-between align-items-center",
-          to: '/${project.id}',
+          to: "/".concat(project.id),
           key: project.id
         }, project.title, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("span", {
           className: "badge badge-primary badge-pill"
