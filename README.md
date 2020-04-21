@@ -400,7 +400,7 @@ Route::view('/{path?}', 'app');
 
 다음으로 'resources/views' 디렉토리에 'app.blade.php' 뷰파일을 생성한 후, 밑의 코드들을 추가해 줍시다.
 
-```html
+```php
 //resources/view/app.blade.php
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
@@ -445,7 +445,7 @@ id값이 'app'인 빈 div에 리액트 컴포넌트들이 렌더링 될 것 입�
 리액트 컴포넌트들의 기본(베이스)이 'App' 컴포넌트 입니다. 
 기존 'resources > js > components > Example.js' 파일의 이름을 'App.js'로 수정하고 안에 있는 코드 내용도 아래의 내용으로 업데이트 합니다.
 
-```react
+```js
 //resources > js > components > App.js
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
@@ -478,7 +478,7 @@ $ npm install react-router-dom
 > 싱글 페이지라고 해도 여러 화면이 필요하기 때문에 각 주소가 필요하다. 결국 다른 주소에 따라 다른 뷰를 보여주는 **라우팅** 기능이 필요한 것이다. 하지만 리액트 자체에는 이 기능이 내장되어 있지 않다. 그래서 그 기능을 도와주는 라이브러리 `react-router-dom`이 필요한 것이라고 한다. (브라우저에서만 사용되는 리액트 라우터이다.)
 
 'react-router-dom'이 install되는 동안 'resource/assets/js/app.js' 파일을 열어 example로 되어있는 코드를 아래의 코드로 수정합니다.
-```react
+```js
 require('./components/app');
 ```
 
@@ -489,7 +489,7 @@ require('./components/app');
 위에서 언급했던 'Header' 컴포넌트를 만들어 봅시다.
 'resources > assets > js > components' 폴더에 'Header.js'파일을 생성해서 아래의 코드를 업데이트 합니다.
 
-```react
+```js
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -515,7 +515,7 @@ export default Header;
 아직 완료되지 않은 프로젝트들의 리스트가 보여져야 합니다.
 'resources > assets > js > components' 폴더안에 'ProjectList.js'파일을 생성 후 아래의 코드를 업데이트 합니다.
 
-```react
+```js
 import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
 import Axios from 'axios';
@@ -581,7 +581,7 @@ export default ProjectList
 
 테스트 하기 전, `App.js` 컴포넌트에 아래의 코드를 업데이트 합시다.
 
-```react
+```js
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
@@ -611,7 +611,7 @@ ReactDOM.render(<App />, document.getElementById('app'));
 'ProjectList'컴포넌트에는 `<Link to='/create'>`로 새로운 프로젝트 생성 페이지로 링크되어 있습니다. 해당 페이지를 만들어 봅시다.
 'resources > assets > js > components' 폴더 안에 **NewProject.js**파일을 생성하고 아래의 코드를 따라 업데이트 해 줍니다.
 
-```react
+```js
 //resources > assets > js > components > NewProject.js
 import React, { Component } from 'react';
 import Axios from 'axios';
@@ -715,7 +715,7 @@ class NewProject extends Component {
 4.`hasErrorFor()`메소드는 지정된 필드값들이(name,description)이 에러가 있는지 없는지를 체크한 후 'true','false'값을 리턴시켜 줍니다. 결국 `renderErrorFor()`메소드에서 이 리턴값을 이용해 필드값에 문제가 있을 경우 에러메세지를 노출시켜 줍니다.
 
 ProjectList 컴포넌트와 마찬가지로, `App` 컴포넌트에 `NewProject`를 추가시켜 줍시다.
-```react
+```js
 import React, { Component } from 'react';
 import ReactDOM fro 'react-dom';
 import { Browser as Router, Switch, Router } from 'react-router-dom';
@@ -752,7 +752,7 @@ ReactDOM.render('<App />', document.getElementById('app'))
 
 `resource/assets/js/components` 디렉토리에 `SingleProject.js`파일을 생성 후 아래의 코드를 추가해 줍니다.
 
-```react
+```js
 //resources/assets/js/components/SingleProject.js
 import React, { Component } from 'react';
 import Axios from 'react-router-dom';
@@ -827,7 +827,7 @@ export default SingleProject;
 
 다음으로 `App`컴포넌트에 `SingleProject`컴포넌트를 추가해 줍시다.
 
-```react
+```js
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import ProjectList from './components/ProjectList';
@@ -1003,6 +1003,76 @@ handleMarkTaskAsCompleted = taskId => {
 />
 ```
 위의 버튼을 클릭하게되면 `handleMarkTaskAsCompleted`메소드에 해당 task의 id값을 전달해 줍니다.
+
+### 13. Testing out the APP
+모든 작업 과정이 완료 되었습니다. 
+앱 테스트를 하기 전에 [라라벨 mix](https://laravel.kr/docs/6.x/mix)를 활용해 자바스크립트를 컴파일 하기 위해 터미널의 아래의 코드를 실행 시킵니다.
+```
+$npm run dev
+```
+문제없이 진행되었다면 로컬 서버 http://127.0.0.1:8000 에서 직접 테스트 해봅시다.
+```
+$php artisan serve
+```
+
+#### !! 실제 테스트를 진행하면서 생긴 Error 이슈와 해결방법 !!
+> 아무 문제없이 테스트를 해볼 수 있을 거란 예상은 하지 않았다.
+##### [Erro.1] `$npm run dev` 명령어 실행시 발생
+```
+//에러 메세지를 간단히 정리해보자면
+Support for the experimental syntax 'classProperties' isn't currently enabled (14:20):
+
+  21 |          })
+  22 |  }
+> 23 |  handleMarkProjectAsCompleted = () => {
+     |                               ^
+  24 |          const { history } = this.props;
+  25 |          axios.put(`/api/projects/${this.state.project.id}`)
+  26 |                  .then(response => history.push('/'))
+  
+Add @babel/plugin-proposal-class-properties (https://git.io/vbSL) to the 'plugin' section of your Babel config to enable transformation.
+```
+> 뭔가 `@babel/plugin-proposal-class-properties` 가 install되지 않았고 그와 관련된 설정을 해주지 않아서 생기지 않았을까 라는 생각을 해보았다. 해결방법을 위해 구글 서치 후 정리해 보았다.
+
+[해결방법]
+1.@babel/plugin-proposal-class-properties 설치하기
+```
+npm install --save-dev @babel/plugin-proposal-class-properties
+```
+2.`.babelrc`파일 생성 후 아래의 코드 추가
+```
+{
+    "presets": [
+        "@babel/preset-env",
+        "@babel/preset-react"
+     ],
+    "plugins": [
+        "@babel/plugin-proposal-class-properties"
+     ]
+}
+```
+
+
+##### [Error.2] 각종 오타로 생긴 문제들
+1. ProjectList.js에서 <Link to={'/${project.id}'} '이 아닌 `로 오타 수정
+2. SinglProject.js에서 state의 taskTitle과 <input name='title'> 미스 매칭으로 taskTitle->title로 수정
+3. `Uncaught (in promise) TypeError: _this2.state is not a function`이런 에러 메세지가 나왔었는데 알고보니 SingleProject.js > componentDidMount메소드에서 this.setState({})가 아닌 this.state로 되어 있었음
+
+> 위의 이슈들을 전부 수정하고 나니 아무 문제없이 Taskman APP을 테스트 할 수 있었다.
+
+
+#### //작업 후기 ####
+처음으로 영어 원문을 번역해가며 예제를 따라 만들어 보았다. 회사에 일찍 출근해 짬짬히 진행해서 그런지 시간이 엄청나게 소비된거 같다.
+
+기존에는 코드 나온거만 보고 대충 따라 쳐보고 결과물에만 포커스를 맞췄다면 이번에는 과정, 즉 왜 이 코드를 추가했는지 어떤 역할을 하는지 등 원문을 차분히 번역해가며 이해하는데에 집중했다.
+
+나의 모자른 코딩 지식과 영어 지식에 다시 한번 나를 되돌아보는 계기가 되었던거 같다. (모르는 영단어가 이리 많을 줄이야 ㅠㅠ) 난생 처음으로 포기 하지 않고 끝까지 물고 늘어져 완료한 점에 대해서는 나 자신한테 고생했다고 말해주고 싶다.
+
+결과물만 봤을때 굉장히 간단한 웹 어플리케이션이지만 백엔드 단의 라라벨과 프론트 단의 리액트가 어떻게 연동이 되는지 전체적으로 이해하는데 정말 좋은 예제가 된거 같다.
+
+다음으로 간단하게 만든 웹 서비스를 AWS(아마존 웹 서비스)에 직접 업로드 해보고 빌드와 버전관리 등을 체험해볼지, 리액트의 데이터 관리 state가 아닌 mobX나 redux를 활용해보는 공부를 해볼지 고민해봐야겠다.
+
+이 예제 덕분에 와이프의 맥북을 몰래 사무실로 가져와 맥북에 익숙해지고 언제 어디서든 맥북만 있으면 코딩할 수 있는 작은 습관을 들일 수 있게 되어 정말 감사하게 생각한다.
 
 
 

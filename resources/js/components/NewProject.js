@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import Axios from 'axios';
+import axios from 'axios';
 
 class NewProject extends Component {
 	constructor(props) {
@@ -25,7 +25,7 @@ class NewProject extends Component {
 			description: this.state.description
 		}
 
-		Axios.post('/api/projects', project)
+		axios.post('/api/projects', project)
 			.then(response => {
 				//redirect to the homepage
 				history.push('/')
@@ -61,7 +61,7 @@ class NewProject extends Component {
 							<div className='card-body'>
 								<form onSubmit={this.handleCreateNewProject}>
 									<div className='form-group'>
-										<label htmlFor='title'>Project title</label>
+										<label htmlFor='name'>Project title</label>
 										<input
 											id='title'
 											type='text'
@@ -95,3 +95,4 @@ class NewProject extends Component {
 }
 
 export default NewProject;
+

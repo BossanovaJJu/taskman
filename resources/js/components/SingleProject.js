@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Axios from 'react-router-dom';
+import axios from 'axios';
 
 class SingleProject extends Component {
 	constructor(props) {
@@ -7,14 +7,14 @@ class SingleProject extends Component {
 		this.state = {
 			project: {},
 			tasks: [],
-			taskTitle: '',
-			taskErros: []
+			title: '',
+			errors: []
 		}
 	}
 	componentDidMount() {
 		const projectId = this.props.match.params.id;
 		axios.get(`/api/projects/${projectId}`).then(response => {
-			this.state({
+			this.setState({
 				project: response.data,
 				tasks: response.data.tasks
 			})
@@ -22,27 +22,27 @@ class SingleProject extends Component {
 	}
 	handleMarkProjectAsCompleted = () => {
 		const { history } = this.props;
-		Axios.put(`/api/projects/${this.state.project.id}`)
+		axios.put(`/api/projects/${this.state.project.id}`)
 			.then(response => history.push('/'))
 	}
 	handleFieldChange = event => {
 		this.setState({
-			taskTitle: event.target.value
+			title: event.target.value
 		})
 	}
 	handleAddNewTask = event => {
 		event.preventDefault();
 
 		const task = {
-			taskTitle: this.state.taskTitle,
+			title: this.state.title,
 			project_id: this.state.project.id
 		}
 
-		Axios.post('/api/tasks', task)
+		axios.post('/api/tasks', task)
 			.then(response => {
 				//clear form input
 				this.setState({
-					taskTitle: ''
+					title: ''
 				})
 				//add new task to list of tasks
 				this.setState(prevState => ({
@@ -51,24 +51,24 @@ class SingleProject extends Component {
 			})
 			.catch(error => {
 				this.setState({
-					taskErrors: error.response.data.errors
+					errors: error.response.data.errors
 				})
 			})
 	}
 	hasErrorFor = field => {
-		return !!this.state.taskErrors[field]
+		return !!this.state.errors[field]
 	}
 	renderErrorFor = field => {
-		if(hasErrorFor) {
+		if(this.hasErrorFor(field)) {
 			return (
 				<span className='invalid-feedback'>
-					<strong>{this.state.taskErrors[field][0]}</strong>
+					<strong>{this.state.errors[field][0]}</strong>
 				</span>
 			)
 		}
 	}
 	handleMarkTaskAsCompleted = taskId => {
-		Axios.put(`/api/tasks/${taskId}`)
+		axios.put(`/api/tasks/${taskId}`)
 			.then(response => {
 				this.setState(prevState => ({
 					tasks: prevState.tasks.filter(task => {
@@ -102,7 +102,7 @@ class SingleProject extends Component {
 												name='title'
 												className={`form-control ${this.hasErrorFor('title') ? 'is-invalid' : ''}`}
 												placeholder='Task title'
-												value={this.state.taskTitle}
+												value={this.state.title}
 												onChange={this.handleFieldChange}
 										/>
 										<div className='input-group-append'>
@@ -120,7 +120,8 @@ class SingleProject extends Component {
 											{task.title}
 											<button
 												className='btn btn-primary btn-sm'
-												onClick={this.handleMarkTaskAsCompleted.bind(this, task.id)}
+												// onClick={this.handleMarkTaskAsCompleted.bind(this, task.id)}
+												onClick={ () => {this.handleMarkTaskAsCompleted(task.id)} }
 											>
 												Mark as completed
 											</button>
