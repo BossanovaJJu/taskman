@@ -140,7 +140,7 @@ class Task extends Model
 //app > Project.php
 class Project extends Model 
 {
-	protected $fillable = ['name', 'description'];
+	protected $fillable = ['title', 'description'];
 	
 	public function tasks() 
 	{
@@ -494,7 +494,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Header = () => (
-	<nav className='navbar navbar-expand-md navbar-light navbar-laravel'>
+	<nav className='navbar navbar-expand-md navbar-dark bg-dark navbar-laravel'>
 		<div className='container'>
 			<Link className='navbar-brand'>Taskman</Link>
 		</div>
@@ -550,7 +550,7 @@ class Project extends Component {
 									{projects.map(project => (
 										<Link 
 											className='list-group-item list-group-item-action d-flex justify-content-between align-items-center'
-											to={'/${project.id}'}
+											to={`/${project.id}`}
 											key={project.id}
 										>
 											{project.name}
@@ -1002,6 +1002,8 @@ handleMarkTaskAsCompleted = taskId => {
 	onClick={this.handleMarkTaskAsCompleted.bind(this, task.id)}
 />
 ```
+> `onClick={() => this.handleMarkTaskAsCompleted(task.id)}` 이런식으로 화살표 함수를 이용해 bind(this)를 해주지 않아도 된다.
+
 위의 버튼을 클릭하게되면 `handleMarkTaskAsCompleted`메소드에 해당 task의 id값을 전달해 줍니다.
 
 ### 13. Testing out the APP
@@ -1073,6 +1075,8 @@ npm install --save-dev @babel/plugin-proposal-class-properties
 다음으로 간단하게 만든 웹 서비스를 AWS(아마존 웹 서비스)에 직접 업로드 해보고 빌드와 버전관리 등을 체험해볼지, 리액트의 데이터 관리 state가 아닌 mobX나 redux를 활용해보는 공부를 해볼지 고민해봐야겠다.
 
 이 예제 덕분에 와이프의 맥북을 몰래 사무실로 가져와 맥북에 익숙해지고 언제 어디서든 맥북만 있으면 코딩할 수 있는 작은 습관을 들일 수 있게 되어 정말 감사하게 생각한다.
+
+
 
 
 
