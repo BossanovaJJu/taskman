@@ -35,7 +35,7 @@ class ProjectList extends Component {
 									{projects.map(project => (
 										<Link
 											className='list-group-item list-group-item-action d-flex justify-content-between align-items-center'
-											to={'/${project.id}'}
+											to={`/${project.id}`}
 											key={project.id}
 										>
 											{project.title}
